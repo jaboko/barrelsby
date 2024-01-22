@@ -42,6 +42,15 @@ export const buildBarrel = ({
   exclude: string[];
 }) => {
   logger.debug(`Building barrel @ ${directory.path}`);
+  
+  const destination = path.join(directory.path, barrelName);
+
+  if (fs.existsSync(destination) && 
+      fs.readFileSync(destination).includes('@barrelsby-skip')) {
+        logger.debug(`Skip barrel @ ${directory.path}`);
+        return; 
+      }
+
   let content: string = '';
   if (barrelType === StructureOption.FILESYSTEM) {
     content = buildFileSystemBarrel(
@@ -67,7 +76,6 @@ export const buildBarrel = ({
     throw new Error('No barrel type provided... this is likely a code error');
   }
 
-  const destination = path.join(directory.path, barrelName);
   if (content.length === 0) {
     // Skip empty barrels.
     return;
